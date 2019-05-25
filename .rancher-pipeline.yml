@@ -3,18 +3,21 @@ stages:
   steps:
   - runScriptConfig:
       image: php:7.2
-      shellScript: |-
-        apt-get update
-        apt-get install -y --no-install-recommends git zip libsqlite3-dev zlib1g-dev
-        docker-php-ext-install zip
-        curl --silent --show-error https://getcomposer.org/installer | php
-        ./composer.phar install -n --prefer-dist
-        touch storage/testing.sqlite storage/database.sqlite
-        cp .env.testing .env
-        php artisan migrate
-        php artisan migrate --env=testing --database=sqlite_testing --force
-        ./vendor/bin/codecept build
-        ./vendor/bin/codecept run
+      shellScript: "rm -f /etc/apt/sources.list.d/*\ncat > /etc/apt/sources.list <<EOF
+        \ndeb http://mirrors.aliyun.com/debian/ stretch main non-free contrib\ndeb-src
+        http://mirrors.aliyun.com/debian/ stretch main non-free contrib\ndeb http://mirrors.aliyun.com/debian-security
+        stretch/updates main\ndeb-src http://mirrors.aliyun.com/debian-security stretch/updates
+        main\ndeb http://mirrors.aliyun.com/debian/ stretch-updates main non-free
+        contrib\ndeb-src http://mirrors.aliyun.com/debian/ stretch-updates main non-free
+        contrib\ndeb http://mirrors.aliyun.com/debian/ stretch-backports main non-free
+        contrib\ndeb-src http://mirrors.aliyun.com/debian/ stretch-backports main
+        non-free contrib\nEOF\napt-get update\napt-get install -y --no-install-recommends
+        git zip libsqlite3-dev zlib1g-dev\ndocker-php-ext-install zip\ncurl --silent
+        --show-error https://getcomposer.org/installer | php\n./composer.phar install
+        -n --prefer-dist\ntouch storage/testing.sqlite storage/database.sqlite\ncp
+        .env.testing .env\nphp artisan migrate\nphp artisan migrate --env=testing
+        --database=sqlite_testing --force\n./vendor/bin/codecept build\n./vendor/bin/codecept
+        run"
 - name: Publish image
   steps:
   - publishImageConfig:
@@ -25,3 +28,4 @@ stages:
   steps:
   - applyYamlConfig:
       path: ./deploy/deployment.yaml
+notification: {}
