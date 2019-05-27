@@ -13,8 +13,8 @@ stages:
         contrib\ndeb-src http://mirrors.aliyun.com/debian/ stretch-backports main
         non-free contrib\nEOF\napt-get update\napt-get install -y --no-install-recommends
         git zip libsqlite3-dev zlib1g-dev\ndocker-php-ext-install zip\ncurl --silent
-        --show-error https://getcomposer.org/installer | php\n./composer.phar install
-        -n --prefer-dist\ntouch storage/testing.sqlite storage/database.sqlite\ncp
+        --show-error https://install.phpcomposer.com/installer | php\n./composer.phar
+        install -n --prefer-dist\ntouch storage/testing.sqlite storage/database.sqlite\ncp
         .env.testing .env\nphp artisan migrate\nphp artisan migrate --env=testing
         --database=sqlite_testing --force\n./vendor/bin/codecept build\n./vendor/bin/codecept
         run"
